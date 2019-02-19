@@ -1,17 +1,17 @@
-#   _____        _       ______       _              
-#  |  __ \      | |     |  ____|     | |             
-#  | |  | | __ _| |_ ___| |__   _ __ | |_ _ __ _   _ 
+#   _____        _       ______       _
+#  |  __ \      | |     |  ____|     | |
+#  | |  | | __ _| |_ ___| |__   _ __ | |_ _ __ _   _
 #  | |  | |/ _` | __/ _ \  __| | '_ \| __| '__| | | |
 #  | |__| | (_| | ||  __/ |____| | | | |_| |  | |_| |
 #  |_____/ \__,_|\__\___|______|_| |_|\__|_|   \__, |
 #                                               __/ |
-#                                              |___/ 
-#
+#                                              |___/
+
 # A ttk widget extention to allow date inputting with validation and retrieval.
-# Contains option for either grey-filling it with text that will dissappear or 
+# Contains option for either grey-filling it with text that will dissappear or
 # actuall pre-filling the date.
 #
-# =================================== 
+# ===================================
 # Example of how to create the widget.
 # ===================================
 # root = tk.TK()
@@ -28,7 +28,7 @@
 # year = date1.year
 # month = date1.month
 # day = date1.day
-# 
+#
 # ===================================
 # How to check is date in box is valid.
 # ===================================
@@ -39,23 +39,25 @@
 import tkinter.ttk as ttk
 from datetime import datetime
 
+
 class DateEntry(ttk.Entry):
     def __init__(self, master, prefill=False, text="YYYY-MM-DD", **kwargs):
-        """set prefill=True if the text needs to stay after clicking into the box"""
+        """set prefill=True if the text needs to stay after
+        clicking into the box"""
         ttk.Entry.__init__(self, master, **kwargs)
         self.master = master
         self.text = text
+        self.prefill = prefill
         self.bind('<FocusIn>', self._focus_in)
         self.bind('<FocusOut>', self._focus_out)
         self.insert(0, text)
         self.configure(foreground='grey')
 
     def _focus_in(self, event=None):
-        if self.text == self.get():
+        if self.text == self.get() and not self.prefill:
             self.delete(0, 'end')
         self.configure(foreground='black')
-        self.configure(background='white')
-    
+
     def _focus_out(self, event=None):
         if self.get() == '':
             self.configure(foreground='grey')
@@ -70,10 +72,12 @@ class DateEntry(ttk.Entry):
 
         if date_valid:
             self.configure(foreground='black')
-            self.configure(background='white')
         else:
+            # need to re-input data to get rid of any potential highlighting.
+            temp_text = self.get()
+            self.delete(0, 'end')
+            self.insert(0, temp_text)
             self.configure(foreground='red')
-            self.configure(background='red')
 
     @property
     def is_valid(self):
